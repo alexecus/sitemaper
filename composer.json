@@ -1,0 +1,30 @@
+{
+    "name": "alexecus/sitemaper",
+    "description": "Sitemaper is a library to generate flexible sitemaps",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "alexecus",
+            "email": "alex.tenepere@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/serializer": "^4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Alexecus\\Sitemaper\\": "src/"
+        }
+    },
+    "config": {
+        "process-timeout" : 0
+    },
+    "scripts": {
+        "serve": "php -S sitemaper.env:8080 >& /dev/null",
+        "test": "phpunit"
+    },
+    "require-dev": {
+        "kint-php/kint": "^3.0"
+    }
+}
