@@ -2,16 +2,20 @@
 
 namespace Alexecus\Sitemaper;
 
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+
 class SitemapIndex
 {
+    private $basepath;
     private $sitemaps = [];
     private $options = [];
 
     /**
      *
      */
-    public function __construct($sitemaps = [], $options = [])
+    public function __construct($basepath, $sitemaps = [], $options = [])
     {
+        $this->basepath = $basepath;
         $this->sitemaps = $sitemaps;
         $this->options = $options;
     }
@@ -19,7 +23,7 @@ class SitemapIndex
     /**
      *
      */
-    public function addSitemap(Sitemap $sitemap, $filename = NULL)
+    public function addSitemap(Sitemap $sitemap, $filename = NULL, $options = [])
     {
         if (empty($filename)) {
             $count = count($this->sitemaps) + 1;
@@ -54,10 +58,34 @@ class SitemapIndex
      */
     public function write($path)
     {
-        $children = [];
+        $result = [];
 
         foreach ($this->sitemaps as $filename => $sitemap) {
-            $children[$filename] = $sitemap->write('xml');
+            $result['children'][$filename] = $sitemap->transform('xml');
         }
+
+        $result['index'] = $this->generateIndex();
+
+        return $result;
+    }
+
+    /**
+     *
+     */
+    private function generateIndex()
+    {
+        $encoder = new XmlEncoder('sitemapindex');
+
+        $items['@xlmns'] = 'http://www.sitemaps.org/schemas/sitemap/0.9';
+
+        foreach ($this->sitemaps as $filename => $sitemap) {
+            $items['sitemap'][] = [
+                'loc' => rtrim($this->basepath, '/') . $filename,
+            ];
+        }
+
+        return $encoder->encode($items, 'xml', [
+            'xml_encoding' => 'utf-8',
+        ]);;
     }
 }

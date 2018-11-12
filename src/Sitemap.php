@@ -15,7 +15,7 @@ class Sitemap
     /**
      *
      */
-    public function __construct($domain, $items, $options = [])
+    public function __construct($domain, $items = [], $options = [])
     {
         $this->domain = $domain;
 
@@ -24,7 +24,6 @@ class Sitemap
         }
 
         $defaultOptions['attributes']['xlmns'] = 'http://www.sitemaps.org/schemas/sitemap/0.9';
-
         $defaultOptions['transformers']['xml'] = new XmlTransformer();
 
         $this->options = $options + $defaultOptions;
