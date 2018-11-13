@@ -5,8 +5,12 @@ namespace Alexecus\Sitemaper;
 use Alexecus\Sitemaper\Transformer\XmlTransformer;
 use Alexecus\Sitemaper\Transformer\TransformerInterface;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 class Sitemap
 {
+    use WriterTrait;
+
     private $domain;
     private $items = [];
     private $transformers = [];
@@ -23,9 +27,7 @@ class Sitemap
             $this->addItem($key, $value);
         }
 
-        $defaultOptions['attributes']['xlmns'] = 'http://www.sitemaps.org/schemas/sitemap/0.9';
         $defaultOptions['transformers']['xml'] = new XmlTransformer();
-
         $this->options = $options + $defaultOptions;
 
         foreach ($this->options['transformers'] as $key => $value) {
@@ -52,34 +54,9 @@ class Sitemap
     /**
      *
      */
-    public function addItem($location, $options = [])
+    public function setOptions($options)
     {
-        $domain = rtrim($this->domain, '/');
-
-        $xml['loc'] = $domain . $location;
-        $xml += $options;
-
-        $this->items['url'][] = $xml;
-
-        return $this;
-    }
-
-    /**
-     *
-     */
-    public function setItems($items)
-    {
-        $this->items = $items;
-
-        return $this;
-    }
-
-    /**
-     *
-     */
-    public function getItems()
-    {
-        return $this->items;
+        $this->options = $options;
     }
 
     /**
@@ -95,10 +72,33 @@ class Sitemap
     /**
      *
      */
+    public function addItem($location, $options = [])
+    {
+        $domain = rtrim($this->domain, '/');
+
+        $xml['loc'] = $domain . $location;
+        $xml += $options;
+
+        $this->items[] = $xml;
+
+        return $this;
+    }
+
+    /**
+     *
+     */
+    public function toArray()
+    {
+        return $this->items;
+    }
+
+    /**
+     *
+     */
     public function transform($id)
     {
         $transformer = $this->transformers[$id];
 
-        return $transformer->transform($this);
+        return $transformer->transform($this->toArray());
     }
 }

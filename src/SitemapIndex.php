@@ -56,12 +56,28 @@ class SitemapIndex
     /**
      *
      */
-    public function write($path)
+    public function toArray()
     {
         $result = [];
 
         foreach ($this->sitemaps as $filename => $sitemap) {
             $result['children'][$filename] = $sitemap->transform('xml');
+        }
+
+        $result['index'] = $this->generateIndex();
+
+        return $result;
+    }
+
+    /**
+     *
+     */
+    public function write($basepath)
+    {
+        $result = [];
+
+        foreach ($this->sitemaps as $filename => $sitemap) {
+            $sitemap->write($basepath . '/' . $filename, 'xml');
         }
 
         $result['index'] = $this->generateIndex();

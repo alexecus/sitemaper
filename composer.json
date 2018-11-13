@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "symfony/serializer": "^4.1"
+        "symfony/serializer": "^4.1",
+        "symfony/filesystem": "^4.1"
     },
     "autoload": {
         "psr-4": {

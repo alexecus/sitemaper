@@ -13,5 +13,5 @@ interface TransformerInterface
      *
      * @return string
      */
-    public function transform(Sitemap $sitemap);
+    // public function transform(Sitemap $sitemap);
 }

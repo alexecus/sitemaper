@@ -17,23 +17,18 @@ class XmlTransformer implements TransformerInterface
     /**
      * @{inheritdoc}
      */
-    public function transform(Sitemap $sitemap)
+    public function transform(array $items)
     {
+        $data = [];
         $encoder = new XmlEncoder('urlset');
 
-        $attributes = [];
-        $options = $sitemap->getOptions();
+        $data['@xlmns'] = 'http://www.sitemaps.org/schemas/sitemap/0.9';
 
-        if (isset($options['attributes'])) {
-            foreach ($options['attributes'] as $key => $value) {
-                $attributes['@' . $key] = $value;
-            }
+        foreach ($items as $item) {
+            $data['url'][] = $item;
         }
 
-        $items = $sitemap->getItems();
-        $items += $attributes;
-
-        return $encoder->encode($items, 'xml', [
+        return $encoder->encode($data, 'xml', [
             'xml_encoding' => $this->xmlEncoding,
         ]);
     }
