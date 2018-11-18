@@ -2,28 +2,68 @@
 
 namespace Alexecus\Sitemaper;
 
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Filesystem\Filesystem;
+use Alexecus\Sitemaper\Transformer\XmlTransformer;
+use Alexecus\Sitemaper\Transformer\TransformerInterface;
+use Alexecus\Sitemaper\Writer\FileWriter;
+use Alexecus\Sitemaper\Writer\WriterInterface;
 
+/**
+ * Sitemaper sitemap index instances
+ *
+ * @author Alex Tenepere <alex.tenepere@gmail.com>
+ */
 class SitemapIndex
 {
-    private $basepath;
+    private $domain;
+    private $filename;
     private $sitemaps = [];
+    private $transformers = [];
+    private $writer;
     private $options = [];
 
     /**
+     * Public constructor
      *
+     * @param string $domain The domain that this sitemap is bounded to
+     * @param Sitemap[] $sitemaps Optional array of sitemap items
+     * @param string $filename The filename of this sitemap index file
+     * @param array $options Options to extend or modify sitemap behaviors
+     *
+     * Available options:
+     *  TransformerInterface[] 'transformers' Define an assoc array of transformers
+     *  WriterInterface 'writer' Defines a writer class to be used
      */
-    public function __construct($basepath, $sitemaps = [], $options = [])
+    public function __construct($domain, $sitemaps = [], $filename = 'sitemap-index.xml', $options = [])
     {
-        $this->basepath = $basepath;
+        $this->domain = $domain;
+        $this->filename = $filename;
         $this->sitemaps = $sitemaps;
-        $this->options = $options;
+
+        $defaultOptions['transformers']['xml'] = new XmlTransformer('sitemapindex', 'sitemap');
+        $defaultOptions['writer'] = new FileWriter();
+
+        $this->options = $options + $defaultOptions;
+
+        foreach ($this->options['transformers'] as $key => $value) {
+            $this->setTransformer($key, $value);
+        }
+
+        $this->setWriter($this->options['writer']);
     }
 
     /**
+     * Sitemap Methods
      *
      */
-    public function addSitemap(Sitemap $sitemap, $filename = NULL, $options = [])
+
+    /**
+     * Adds a sitemap instance for this sitemap index
+     *
+     * @param Sitemap $sitemap
+     * @param string $filename The filename to be used for this sitemap instance
+     */
+    public function addSitemap(Sitemap $sitemap, $filename = NULL)
     {
         if (empty($filename)) {
             $count = count($this->sitemaps) + 1;
@@ -36,72 +76,125 @@ class SitemapIndex
     }
 
     /**
+     * Transformer Methods
      *
      */
-    public function setSitemaps($sitemaps)
+
+    /**
+     * Sets a transformer class object
+     *
+     * @param string $id The ID of the new transformer
+     * @param TransformerInterface $transformer
+     *
+     * @return self
+     */
+    public function setTransformer($id, TransformerInterface $transformer)
     {
-        $this->sitemaps = $sitemaps;
+        $this->transformers[$id] = $transformer;
 
         return $this;
     }
 
+
     /**
+     * Transforms this sitemap instance to new data format using an existing transformer
      *
+     * @param string $id The ID of the transformer to use
      */
-    public function getSitemaps()
+    public function transform($id)
     {
-        return $this->sitemaps;
+        if (isset($this->transformers[$id])) {
+            $transformer = $this->transformers[$id];
+
+            return $transformer->transform($this->getSitemapIndexArray());
+        }
+
+        throw new \InvalidArgumentException("Invalid transformer with ID of $id");
     }
 
     /**
+     * Get Data Methods
      *
+     */
+
+    /**
+     * Converts the entire sitemap instance to a data array
+     * 
+     * @return array
      */
     public function toArray()
     {
         $result = [];
 
         foreach ($this->sitemaps as $filename => $sitemap) {
-            $result['children'][$filename] = $sitemap->transform('xml');
+            $result['sitemaps'][$filename] = $sitemap->toArray();
         }
 
-        $result['index'] = $this->generateIndex();
+        $result['index'] = $this->getSitemapIndexArray();
 
         return $result;
     }
 
     /**
-     *
+     * Converts the sitemap index to a data array
+     * 
+     * @return array
      */
-    public function write($basepath)
+    private function getSitemapIndexArray()
     {
-        $result = [];
+        $items = [];
 
         foreach ($this->sitemaps as $filename => $sitemap) {
-            $sitemap->write($basepath . '/' . $filename, 'xml');
-        }
-
-        $result['index'] = $this->generateIndex();
-
-        return $result;
-    }
-
-    /**
-     *
-     */
-    private function generateIndex()
-    {
-        $encoder = new XmlEncoder('sitemapindex');
-
-        $items['@xlmns'] = 'http://www.sitemaps.org/schemas/sitemap/0.9';
-
-        foreach ($this->sitemaps as $filename => $sitemap) {
-            $items['sitemap'][] = [
-                'loc' => rtrim($this->basepath, '/') . $filename,
+            $items[] = [
+                'loc' => rtrim($this->domain, '/') . '/' . $filename,
             ];
         }
 
-        return $encoder->encode($items, 'xml', [
-            'xml_encoding' => 'utf-8',
-        ]);;
+        return $items;
+    }
+
+    /**
+     * Writer Methods
+     *
+     */
+
+    /**
+     * Sets a new filesystem writer for this sitemap instance
+     * 
+     * @param mixed $writer
+     */
+    public function setWriter(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
+
+    /**
+     * Invokes a write operation
+     *
+     * @param string $directory The directory to write the set of sitemaps
+     * @param string $format The transfomer ID to be used
+     */
+    public function write($directory, $format = 'xml')
+    {
+        $result = [];
+
+        $directory = rtrim($directory, '/');
+
+        foreach ($this->sitemaps as $filename => $sitemap) {
+            $sitemap->write($directory . '/' . $filename, $format);
+        }
+
+        $this->writeIndex($directory . '/' . $this->filename, $format);
+    }
+
+    /**
+     * Invokes a write operation but for the sitemap index
+     *
+     * @param string $file The complete filepath on where to write the sitemap index output
+     * @param string $format The transfomer ID to be used
+     */
+    public function writeIndex($file, $format)
+    {
+        $this->writer->write($file, $this->transform($format));
     }
 }
