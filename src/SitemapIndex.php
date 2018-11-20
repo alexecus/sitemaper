@@ -95,7 +95,6 @@ class SitemapIndex
         return $this;
     }
 
-
     /**
      * Transforms this sitemap instance to new data format using an existing transformer
      *

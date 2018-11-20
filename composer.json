@@ -29,7 +29,8 @@
     "scripts": {
         "debug": "php -S sitemaper.env:8080",
         "serve": "php -S sitemaper.env:8080 >& /dev/null",
-        "test": "phpunit"
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html reports"
     },
     "require-dev": {
         "kint-php/kint": "^3.0",

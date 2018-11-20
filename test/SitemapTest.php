@@ -109,6 +109,33 @@ class SitemapTest extends TestCase
         $this->assertEquals($this->sitemapArray, $sitemap->transform('mock'));
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidTransform()
+    {
+        $sitemap = new Sitemap('http://domain.com');
+
+        $sitemap
+            ->addItem('/', [
+                'lastmod' => '2005-05-15',
+                'changefreq' => 'monthly',
+                'priority' => '1.0',
+            ])
+            ->addItem('/page', [
+                'lastmod' => '2005-05-15',
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ])
+            ->addItem('/page/item', [
+                'lastmod' => '2005-05-15',
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ]);
+
+        $sitemap->transform('undefined');
+    }
+
     public function testWrite()
     {
         $transformer = $this->createMock(TransformerInterface::class);
