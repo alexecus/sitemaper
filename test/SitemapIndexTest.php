@@ -1,4 +1,5 @@
 <?php
+
 namespace Alexecus\Sitemaper\Test;
 
 use PHPUnit\Framework\TestCase;

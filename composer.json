@@ -34,6 +34,7 @@
     },
     "require-dev": {
         "kint-php/kint": "^3.0",
-        "phpunit/phpunit": "^7"
+        "phpunit/phpunit": "^7",
+        "mikey179/vfsStream": "^1.6"
     }
 }

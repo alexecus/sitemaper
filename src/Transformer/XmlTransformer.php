@@ -92,7 +92,33 @@ class XmlTransformer implements TransformerInterface
         $this->itemtag = $itemtag;
         $this->attributes = array_replace($this->attributes, $attributes);
         $this->encoding = $encoding;
-        $this->extensions = array_replace($this->extensions, $attributes);
+        $this->extensions = array_replace($this->extensions, $extensions);
+    }
+
+    /**
+     * Appends extensions
+     *
+     * @param array $extensions
+     * @return self
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_replace($this->attributes, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Appends extensions
+     *
+     * @param array $extensions
+     * @return self
+     */
+    public function withExtension($extensions)
+    {
+        $this->extensions = array_replace($this->extensions, $extensions);
+
+        return $this;
     }
 
     /**
@@ -130,7 +156,7 @@ class XmlTransformer implements TransformerInterface
 
                 if (isset($extension['attributes'])) {
                     $this->attributes = array_replace($this->attributes, $extension['attributes']);
-                }   
+                }
 
                 if (isset($extension['transform'])) {
                     $key = $extension['transform'];
@@ -152,7 +178,11 @@ class XmlTransformer implements TransformerInterface
         $result = [];
 
         foreach ($values as $key => $value) {
-            $result[$prefix . ':' . $key] = $value;
+            if (is_array($value)) {
+                $result[$prefix . ':' . $key] = $this->prefixKeys($prefix, $value);
+            } else {
+                $result[$prefix . ':' . $key] = $value;
+            }
         }
 
         return $result;
