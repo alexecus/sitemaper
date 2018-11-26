@@ -4,6 +4,8 @@
 generate sitemap files. It can generate into various format such as XML.
 It can also output the sitemap as raw data so you can bind it to a controller for example.
 
+**View complete documentation on the [official website](https://alexecus.com/project/sitemaper)**
+
 ```php
 use Alexecus\Sitemaper\Sitemap;
 
