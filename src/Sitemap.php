@@ -149,7 +149,7 @@ class Sitemap
      * @param string $file The complete filepath on where to write the sitemap output
      * @param string $format The transfomer ID to be used
      */
-    public function write($file, $format)
+    public function write($file, $format = 'xml')
     {
         $this->writer->write($file, $this->transform($format));
     }
