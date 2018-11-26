@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/banner.png" width="450"></p>
 
 **Sitemaper** is a very flexible PHP sitemap generator library that you can use to 
-generate sitemap files. It can generate in to various format such as XML.
+generate sitemap files. It can generate into various format such as XML.
 It can also output the sitemap as raw data so you can bind it to a controller for example.
 
 ```php
