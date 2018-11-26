@@ -1,3 +1,38 @@
 # Sitemaper
 
-A very flexible PHP sitemap generator library to suit all your sitemap needs
+Sitemaper is a very flexible PHP sitemap generator library that you can use to 
+generate sitemap files. It can generate in to various format such as XML.
+It can also output the sitemap as raw data so you can bind it to a controller for example.
+
+```php
+use Alexecus\Sitemaper\Sitemap;
+
+$sitemap = new Sitemap('http://mysite.com');
+
+$sitemap
+    ->addItem('/', [
+        'lastmod' => '2020-05-15',
+        'changefreq' => 'monthly',
+        'priority' => '1.0',
+    ])
+    ->addItem('/page', [
+        'lastmod' => '2020-05-15',
+        'changefreq' => 'daily',
+        'priority' => '0.8',
+    ]);
+
+$sitemap->write('sitemap.xml');
+```
+
+### What can Sitemaper do
+* Generate XML files 
+* Output sitemap XML response from your controller
+* Generate sitemap index files
+
+### Why choose Sitemaper
+* Probably the most flexible, you can even change the transformers and writers
+* Support for Google sitemap extensions
+* Support for sitemap index files
+* 100% test code coverage
+* Fluent usage
+* Fully documented
