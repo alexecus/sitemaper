@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.png" width="450"></p>
+
 # Sitemaper
 
 Sitemaper is a very flexible PHP sitemap generator library that you can use to 
