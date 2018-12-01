@@ -26,6 +26,14 @@ $sitemap
 $sitemap->write('sitemap.xml');
 ```
 
+### Installation
+
+Install via Composer
+
+```bash
+$ composer require alexecus/sitemaper
+```
+
 ### What can Sitemaper do
 * Generate XML files 
 * Output sitemap XML response from your controller
