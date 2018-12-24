@@ -1,6 +1,7 @@
 <p align="center"><img src="assets/banner.png" width="450"></p>
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/81f3fdc4d721b3f39b3b/maintainability)](https://codeclimate.com/github/alexecus/sitemaper/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/81f3fdc4d721b3f39b3b/test_coverage)](https://codeclimate.com/github/alexecus/sitemaper/test_coverage)
 
 **Sitemaper** is a very flexible PHP sitemap generator library that you can use to 
 generate sitemap files. It can generate into various format such as XML.
