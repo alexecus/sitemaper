@@ -9,6 +9,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
+  - composer install
   - phpunit --testsuite=unit --coverage-text --coverage-clover build/logs/clover.xml
 
 after_script:
