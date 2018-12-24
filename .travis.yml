@@ -14,7 +14,7 @@ before_script:
 
 script:
   - composer install
-  - phpunit --testsuite=unit --coverage-text --coverage-clover build/logs/clover.xml
+  - phpunit --coverage-text --coverage-clover build/logs/clover.xml
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
